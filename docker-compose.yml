@@ -2,8 +2,15 @@ version: "2"
 
 services:
   aosp:
-    image: kylemanna/aosp:latest
+    image: aosp
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    environment:
+      GROUP_ID: "998"
+
     volumes:
-      - ~/aosp/ccache:/tmp/ccache
-      - ~/aosp:/aosp
+      - ./aosp/ccache:/tmp/ccache
+      - ./aosp:/aosp
       - ~/.gitconfig:/root/.gitconfig
+      - ./home:/home
+      - /tmp:/tmp

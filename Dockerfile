@@ -1,7 +1,7 @@
 #
 # Minimum Docker image to build Android AOSP
 #
-FROM ubuntu:16.04
+FROM ubuntu:20.04
 
 MAINTAINER Kyle Manna <kyle@kylemanna.com>
 
@@ -12,13 +12,19 @@ RUN echo "dash dash/sh boolean false" | debconf-set-selections && \
 
 # Keep the dependency list as short as reasonable
 RUN apt-get update && \
-    apt-get install -y bc bison bsdmainutils build-essential curl \
-        flex g++-multilib gcc-multilib git gnupg gperf lib32ncurses5-dev \
-        lib32z1-dev libesd0-dev libncurses5-dev \
-        libsdl1.2-dev libwxgtk3.0-dev libxml2-utils lzop sudo \
-        openjdk-8-jdk \
-        pngcrush schedtool xsltproc zip zlib1g-dev graphviz && \
+    DEBIAN_FRONTEND=noninteractive TZ=Asia/Singapore \
+    apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib \
+    git gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev liblz4-tool \
+    libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils \
+    lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev \
+    sudo cgpt xxd && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive TZ=Asia/Singapore \
+    apt-get install -y python && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 
 ADD https://commondatastorage.googleapis.com/git-repo-downloads/repo /usr/local/bin/
 RUN chmod 755 /usr/local/bin/*
@@ -33,7 +39,7 @@ COPY ssh_config /root/.ssh/config
 
 # The persistent data will be in these two directories, everything else is
 # considered to be ephemeral
-VOLUME ["/tmp/ccache", "/aosp"]
+# VOLUME ["/tmp/ccache", "/aosp"]
 
 # Work in the build directory, repo is expected to be init'd here
 WORKDIR /aosp
